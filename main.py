@@ -5,16 +5,14 @@ from math import sqrt
 if __name__ == '__main__':
     startX = 0
     startY = 0
-    endX = 479
-    endY = 479
+    endX = 20
+    endY = 20
 
     map = Map('Colorado_480x480.dat')
 
     open = []
     closed = []
     open.append(map.getSpace(startX, startY))
-
-    print(open[0].elev)
 
     checking = open[0]
 
@@ -25,14 +23,40 @@ if __name__ == '__main__':
 
         for x in range(-1, 2):
             for y in range(-1, 2):
-                if checking.x + x > 0 and checking.y + y > 0 and checking.y + y < len(map.grid)\
-                        and checking.x + x < len(map.grid[0]) and (x != 0 or y != 0):
-                    temp = Space(x, y, checking,
-                                      checking.g + abs(map.grid[checking.x][checking.y] - map.grid[x][y]),
-                                      sqrt(abs(startX - endX) ** 2 + abs(startY - endY) ** 2))
-                    if not temp in closed:
-                        open.append(temp)
-                        print('CLOSED' + str(map.grid[temp.x][temp.y]))
+                if 0 <= checking.x + x < len(map.grid[0]) and 0 <= checking.y + y < len(map.grid) and (x != 0 or y != 0):
+                    temp = map.getSpace(checking.x + x, checking.y + y)
+
+                    newG = checking.g + abs(temp.elev - checking.elev)
+                    if temp.g == 0 or temp.g > newG:
+                        temp.setG(newG)
+                        temp.setNewParent(checking)
+                        if temp in closed:
+                            closed.remove(temp)
+                        if temp not in open:
+                            open.append(temp)
+
+                    if temp.h == 0:
+                        xdist = float(endY - temp.x)
+                        ydist = float(endY - temp.y)
+                        xint = 0.00
+                        yint = 0.00
+
+                        if ydist <= xdist:
+                            xint = xdist / abs(ydist)
+                            yint = ydist / abs(ydist)
+                        elif xdist < ydist:
+                            yint = ydist / abs(xdist)
+                            xint = xdist / abs(xdist)
+
+                        currentelev = temp.elev
+                        change = 0
+                        count = 1
+                        while abs(xint * count + temp.x) < abs(xdist) and abs(yint * count + temp.y) < abs(ydist):
+                            theo = map.getSpace(int(round(xint * count)) + temp.x, int(round(yint * count)) + temp.y)
+                            change += abs(currentelev - theo.elev)
+                            currentelev = theo.elev
+                            count += 1
+                        temp.setH(change)
 
         minF = open[0]
         for space in open:
@@ -40,4 +64,13 @@ if __name__ == '__main__':
                 minF = space
         checking = minF
 
-        print(map.grid[checking.x][checking.y])
+        print('checking: ' + '(' + str(checking.x) + ', ' + str(checking.y) + ') ' + str(checking.elev))
+
+    node = map.getSpace(endX, endY)
+    print('(' + str(node.x) + ', ' + str(node.y) + ') ')
+    pathing = True
+    while pathing:
+        node = node.parent
+        print('(' + str(node.x) + ', ' + str(node.y) + ') ')
+        if node.x == startX and node.y == startY:
+            pathing = False

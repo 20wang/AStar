@@ -18,3 +18,9 @@ class Space:
 
     def setNewParent(self, parent):
         self.parent = parent
+
+    def setG(self, g):
+        self.g = g
+
+    def setH(self, h):
+        self.h = h
