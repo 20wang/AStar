@@ -1,3 +1,5 @@
+from space import *
+
 class Map:
     grid = []
 
@@ -13,3 +15,15 @@ class Map:
             for c in range(len(self.grid[r])):
                 self.grid[r][c] = int(self.grid[r][c])
         file.close()
+
+        self.all_spaces = []
+        for x in range(len(self.grid)):
+            for y in range(len(self.grid[0])):
+                self.all_spaces.append\
+                    (Space(x, y, None, 0, 0, self.grid[x][y]))
+
+    def getSpace(self, x, y):
+        for s in self.all_spaces:
+            if s.x == x and s.y == y:
+                return s
+        return None

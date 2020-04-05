@@ -10,8 +10,11 @@ if __name__ == '__main__':
 
     map = Map('Colorado_480x480.dat')
 
-    open = [Space(startX, startY, 0, 0, sqrt(abs(startX - endX)**2 + abs(startY - endY)**2))]
+    open = []
     closed = []
+    open.append(map.getSpace(startX, startY))
+
+    print(open[0].elev)
 
     checking = open[0]
 
@@ -29,7 +32,7 @@ if __name__ == '__main__':
                                       sqrt(abs(startX - endX) ** 2 + abs(startY - endY) ** 2))
                     if not temp in closed:
                         open.append(temp)
-                        print(temp)
+                        print('CLOSED' + str(map.grid[temp.x][temp.y]))
 
         minF = open[0]
         for space in open:
