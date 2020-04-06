@@ -1,14 +1,44 @@
-from grid import *
-from space import *
-from math import sqrt
+# uses an A* pathing algorithm to plot a course through a topographic map
 
+import pygame
+from grid import *
+from pygame import *
+import sys
+import numpy as np
+
+# draws a map
+def drawMap(map):
+    # map drawin' code courtesy of the amazing Christos Polzak
+    arr_max = np.max(map.grid)
+    arr_min = np.min(map.grid)
+    color_arr = (255 * (map.grid - arr_min) / (arr_max - arr_min)).astype(int)
+    gray = np.stack((color_arr, color_arr, color_arr), axis=-1)
+    px = 1
+
+    pygame.init()
+    win = pygame.display.set_mode((len(gray[0]) * px, len(gray) * px))  # based on map size
+    for r in range(len(gray)):
+        for c in range(len(gray[r])):
+            pygame.draw.rect(win, gray[r][c], (c * px, r * px, px, px))
+    pygame.display.update()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit(0)
+        # pygame.display.flip()
+
+# main method for the class
 if __name__ == '__main__':
+
     startX = 0
     startY = 0
     endX = 69
     endY = 100
 
     map = Map('Colorado_480x480.dat')
+    drawMap(map)
 
     open = []
     closed = []
@@ -36,27 +66,34 @@ if __name__ == '__main__':
                             open.append(temp)
 
                     if temp.h == 0:
-                        xdist = float(endY - temp.x)
+                        xdist = float(endX - temp.x)
                         ydist = float(endY - temp.y)
                         xint = 0.00
                         yint = 0.00
+                        if xdist == 0 and ydist == 0:
+                            temp.setH(0)
+                        else:
+                            if xdist == 0:
+                                yint = ydist / abs(ydist)
+                            elif ydist == 0:
+                                xint = xdist / abs(xdist)
+                            else:
+                                if abs(ydist) >= abs(xdist):
+                                    xint = xdist / abs(ydist)
+                                    yint = ydist / abs(ydist)
+                                elif abs(xdist) > abs(ydist):
+                                    yint = ydist / abs(xdist)
+                                    xint = xdist / abs(xdist)
 
-                        if abs(ydist) >= abs(xdist):
-                            xint = xdist / abs(ydist)
-                            yint = ydist / abs(ydist)
-                        elif abs(xdist) > abs(ydist):
-                            yint = ydist / abs(xdist)
-                            xint = xdist / abs(xdist)
-
-                        currentelev = temp.elev
-                        change = 0
-                        count = 1
-                        while not (abs(xint * count + temp.x) == abs(xdist) or abs(yint * count + temp.y) == abs(ydist)):
-                            theo = map.getSpace(int(round(xint * count)) + temp.x, int(round(yint * count)) + temp.y)
-                            change += abs(currentelev - theo.elev)
-                            currentelev = theo.elev
-                            count += 1
-                        temp.setH(change)
+                            currentelev = temp.elev
+                            change = 0
+                            count = 1
+                            while not (abs(xint * count) == abs(xdist) or abs(yint * count) == abs(ydist)):
+                                theo = map.getSpace(int(round(xint * count)) + temp.x, int(round(yint * count)) + temp.y)
+                                change += abs(currentelev - theo.elev)
+                                currentelev = theo.elev
+                                count += 1
+                            temp.setH(change)
 
         minF = open[0]
         for space in open:
@@ -68,10 +105,12 @@ if __name__ == '__main__':
         print('h: ' + str(checking.h))
 
     node = map.getSpace(endX, endY)
+    path = [node]
     print('(' + str(node.x) + ', ' + str(node.y) + ') ')
     pathing = True
     while pathing:
         node = node.parent
+        path.append(node)
         print('(' + str(node.x) + ', ' + str(node.y) + ') ')
         if node.x == startX and node.y == startY:
             pathing = False

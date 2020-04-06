@@ -1,8 +1,11 @@
+# creates a grid from a file of elevations
+
 from space import *
 
 class Map:
     grid = []
 
+    # constructor for class
     def __init__(self, fileName):
 
         # code shamelessly stolen from Julian Cochran
@@ -21,6 +24,7 @@ class Map:
             for y in range(len(self.grid[0])):
                 self.all_spaces.append(Space(x, y, None, 0, 0, self.grid[x][y]))
 
+    # finds a space object from the list based on its coordinates
     def getSpace(self, x, y):
         for s in self.all_spaces:
             if s.x == x and s.y == y:
