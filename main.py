@@ -6,8 +6,9 @@ from pygame import *
 import sys
 import numpy as np
 
+
 # draws a map
-def drawMap(map):
+def drawMap(map, path):
     # map drawin' code courtesy of the amazing Christos Polzak
     arr_max = np.max(map.grid)
     arr_min = np.min(map.grid)
@@ -20,6 +21,10 @@ def drawMap(map):
     for r in range(len(gray)):
         for c in range(len(gray[r])):
             pygame.draw.rect(win, gray[r][c], (c * px, r * px, px, px))
+
+    for space in path:
+        pygame.draw.rect(win, (200, 0, 0), (space.x * px, space.y * px, px, px))
+
     pygame.display.update()
 
     while True:
@@ -27,18 +32,19 @@ def drawMap(map):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit(0)
+
         # pygame.display.flip()
+
 
 # main method for the class
 if __name__ == '__main__':
 
-    startX = 0
-    startY = 0
-    endX = 69
-    endY = 100
+    startX = 50
+    startY = 200
+    endX = 200
+    endY = 300
 
     map = Map('Colorado_480x480.dat')
-    drawMap(map)
 
     open = []
     closed = []
@@ -114,3 +120,5 @@ if __name__ == '__main__':
         print('(' + str(node.x) + ', ' + str(node.y) + ') ')
         if node.x == startX and node.y == startY:
             pathing = False
+
+    drawMap(map, path)
