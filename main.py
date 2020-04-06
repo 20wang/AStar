@@ -5,8 +5,8 @@ from math import sqrt
 if __name__ == '__main__':
     startX = 0
     startY = 0
-    endX = 20
-    endY = 20
+    endX = 69
+    endY = 100
 
     map = Map('Colorado_480x480.dat')
 
@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     checking = open[0]
 
-    while checking.x != endX and checking.y != endY:
+    while checking.x != endX or checking.y != endY:
 
         closed.append(checking)
         open.remove(checking)
@@ -41,17 +41,17 @@ if __name__ == '__main__':
                         xint = 0.00
                         yint = 0.00
 
-                        if ydist <= xdist:
+                        if abs(ydist) >= abs(xdist):
                             xint = xdist / abs(ydist)
                             yint = ydist / abs(ydist)
-                        elif xdist < ydist:
+                        elif abs(xdist) > abs(ydist):
                             yint = ydist / abs(xdist)
                             xint = xdist / abs(xdist)
 
                         currentelev = temp.elev
                         change = 0
                         count = 1
-                        while abs(xint * count + temp.x) < abs(xdist) and abs(yint * count + temp.y) < abs(ydist):
+                        while not (abs(xint * count + temp.x) == abs(xdist) or abs(yint * count + temp.y) == abs(ydist)):
                             theo = map.getSpace(int(round(xint * count)) + temp.x, int(round(yint * count)) + temp.y)
                             change += abs(currentelev - theo.elev)
                             currentelev = theo.elev
@@ -65,6 +65,7 @@ if __name__ == '__main__':
         checking = minF
 
         print('checking: ' + '(' + str(checking.x) + ', ' + str(checking.y) + ') ' + str(checking.elev))
+        print('h: ' + str(checking.h))
 
     node = map.getSpace(endX, endY)
     print('(' + str(node.x) + ', ' + str(node.y) + ') ')
